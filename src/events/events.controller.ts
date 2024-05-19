@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { events } from './constants';
 import { EventsService } from './events.service';
@@ -7,14 +17,14 @@ import { EventsService } from './events.service';
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Get('/:id/subscribe')
+  @Get(':id/subscribe')
   poll(
     @Res() res: Response,
     @Param('id') id: string,
     @Query('isInitialRequest') isInitialRequestParam: string,
   ) {
     const event = events.find((e) => e.name === id);
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+    if (!event) throw new NotFoundException('Event not found');
 
     const isInitialRequest = isInitialRequestParam === 'true';
     if (isInitialRequest) {
@@ -23,5 +33,16 @@ export class EventsController {
 
     const cb = (data: any) => res.json(data);
     this.eventsService.addClient({ subscribedEvent: event.name, callback: cb });
+  }
+
+  @Post(':id/vote')
+  vote(@Param('id') id: string, @Body() body: any) {
+    const event = events.find((e) => e.name === id);
+    if (!event) throw new NotFoundException('Event not found');
+
+    const answer = body.answer;
+    if (!answer || !['a', 'b'].includes(answer)) {
+      throw new BadRequestException('Invalid answer');
+    }
   }
 }
