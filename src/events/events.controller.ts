@@ -21,13 +21,13 @@ export class EventsController {
   poll(
     @Res() res: Response,
     @Param('id') id: string,
-    @Query('isInitialRequest') isInitialRequestParam: string,
+    @Query('wait') waitParam: string,
   ) {
     const event = events.find((e) => e.name === id);
     if (!event) throw new NotFoundException('Event not found');
 
-    const isInitialRequest = isInitialRequestParam === 'true';
-    if (isInitialRequest) {
+    const wait = waitParam === 'false';
+    if (wait) {
       return res.json(this.eventsService.getCurrentAction(event.name));
     }
 
