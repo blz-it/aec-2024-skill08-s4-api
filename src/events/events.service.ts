@@ -1,49 +1,70 @@
 import { Injectable } from '@nestjs/common';
+import { events, questions } from './constants';
+
+interface Client {
+  subscribedEvent: string;
+  callback: (data: any) => void;
+}
 
 @Injectable()
 export class EventsService {
-  private clients: Array<(data: any) => void> = [];
-  private data: any = { action: null };
+  private clients: Client[] = [];
+  private currentActions: Record<string, any> = events.reduce(
+    (acc, event) => ({ ...acc, [event.name]: { action: null } }),
+    {},
+  );
 
   constructor() {
-    this.scheduleNewAction();
+    events.forEach((event) => this.scheduleNewAction(event.name));
   }
 
-  addClient(client: (data: any) => void) {
+  addClient(client: Client) {
     this.clients.push(client);
   }
 
-  removeClient(client: (data: any) => void) {
-    this.clients = this.clients.filter((c) => c !== client);
+  notifyClients(event: string) {
+    // Notify all clients subscribed to the event
+    this.clients
+      .filter((client) => client.subscribedEvent === event)
+      .forEach((client) => client.callback(this.currentActions[event]));
+
+    // Remove clients subscribed to the event
+    this.clients = this.clients.filter(
+      (client) => client.subscribedEvent !== event,
+    );
   }
 
-  notifyClients() {
-    this.clients.forEach((c) => c(this.data));
-    this.clients = [];
-  }
-
-  scheduleNewAction() {
-    const actions = ['flashlight', 'vote'];
-    const selectedAction = actions[Math.floor(Math.random() * actions.length)];
-    const delay = Math.floor(Math.random() * 15000) + 5000; // 5-20 seconds
+  scheduleNewAction(event: string) {
+    const availableActions = events.find(
+      (e) => e.name === event,
+    ).availableActions;
+    const selectedAction =
+      availableActions[Math.floor(Math.random() * availableActions.length)];
+    const delay = Math.floor(Math.random() * 15000) + 15000; // 15-30 seconds
 
     setTimeout(() => {
-      this.data = { action: selectedAction };
-      this.notifyClients();
+      if (selectedAction === 'flashlight') {
+        this.currentActions[event] = { action: { type: 'flashlight' } };
+      } else if (selectedAction === 'vote') {
+        const question =
+          questions[Math.floor(Math.random() * questions.length)];
+        this.currentActions[event] = { action: { type: 'vote', ...question } };
+      }
+
+      this.notifyClients(event);
 
       setTimeout(
         () => {
-          this.data = { action: null };
-          this.notifyClients();
-          this.scheduleNewAction();
+          this.currentActions[event] = { action: null };
+          this.notifyClients(event);
+          this.scheduleNewAction(event);
         },
         selectedAction === 'flashlight' ? 5000 : 15000,
       );
     }, delay);
   }
 
-  getCurrentAction() {
-    if (Object.keys(this.data).length > 0) return this.data;
-    return { action: null };
+  getCurrentAction(event: string) {
+    return this.currentActions[event];
   }
 }

@@ -1,3 +1,24 @@
+export const actions = ['flashlight', 'vote'];
+
+export const events = [
+  {
+    name: 'aeg-beneficiary-concert',
+    availableActions: ['flashlight'],
+  },
+  {
+    name: 'pop-concert',
+    availableActions: ['flashlight'],
+  },
+  {
+    name: 'AEC-OC',
+    availableActions: ['flashlight', 'vote'],
+  },
+  {
+    name: 'AEC-CC',
+    availableActions: ['flashlight', 'vote'],
+  },
+];
+
 export const questions = [
   {
     question: 'What does CPU stand for?',

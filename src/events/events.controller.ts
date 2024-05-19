@@ -1,24 +1,27 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
+import { events } from './constants';
 import { EventsService } from './events.service';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Get('/subscribe')
+  @Get('/:id/subscribe')
   poll(
-    @Req() req: Request,
     @Res() res: Response,
+    @Param('id') id: string,
     @Query('isInitialRequest') isInitialRequestParam: string,
   ) {
+    const event = events.find((e) => e.name === id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
     const isInitialRequest = isInitialRequestParam === 'true';
     if (isInitialRequest) {
-      return res.json(this.eventsService.getCurrentAction());
+      return res.json(this.eventsService.getCurrentAction(event.name));
     }
 
-    const client = (data: any) => res.json(data);
-    this.eventsService.addClient(client);
-    req.on('close', () => this.eventsService.removeClient(client));
+    const cb = (data: any) => res.json(data);
+    this.eventsService.addClient({ subscribedEvent: event.name, callback: cb });
   }
 }
