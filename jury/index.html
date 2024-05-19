@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Jury Tool</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      #events {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      #events > div {
+        min-height: 200px;
+      }
+
+      div {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 1rem;
+      }
+
+      h3 {
+        margin-top: 0;
+      }
+
+      pre {
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Jury Tool</h1>
+    <div id="events"></div>
+    <script>
+      const events = [
+        'aeg-beneficiary-concert',
+        'pop-concert',
+        'AEC-OC',
+        'AEC-CC',
+      ];
+
+      // Create html elements for each event
+      events.forEach((event) => {
+        const div = document.createElement('div');
+        div.id = event;
+        document.getElementById('events').appendChild(div);
+
+        const h3 = document.createElement('h3');
+        h3.textContent = event;
+        document.getElementById(event).appendChild(h3);
+
+        const pre = document.createElement('pre');
+        pre.id = event + '-data';
+        pre.textContent = 'Loading...';
+        document.getElementById(event).appendChild(pre);
+      });
+
+      // Update data for each event, every second
+      setInterval(() => {
+        events.forEach((event) => {
+          fetch(`http://localhost:3000/events/${event}/subscribe?wait=false`)
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(event + '-data').textContent =
+                JSON.stringify(data, null, 2);
+            });
+        });
+      }, 1000);
+    </script>
+  </body>
+</html>
