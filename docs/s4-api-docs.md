@@ -4,7 +4,7 @@ This is the API documentation for the AEC 2024 Skill 08 Session 4 API.
 
 ## Events
 
-The API provides an endpoint to subscribe to the actions of an event.
+The API provides endpoints to subscribe to the actions of an event and to send an answer to a voting poll.
 
 ### Subscribe to an Event
 
@@ -16,12 +16,39 @@ For the initial request, it is possible to pass the query parameter `wait=false`
 GET /events/:id/subscribe
 ```
 
-Example Response
+Example Responses
 
 ```json
 {
   "action": {
     "type": "flashlight"
   }
+}
+```
+
+```json
+{
+  "action": {
+    "type": "vote",
+    "question": "Which protocol is used to transfer web pages over the internet?",
+    "answerA": "HTTP",
+    "answerB": "FTP"
+  }
+}
+```
+
+### Answer a Poll
+
+This endpoint allows clients to answer a poll. The client should make a POST request to this endpoint with the answer in the request body.
+
+```
+POST /events/:id/vote
+```
+
+Request Body
+
+```
+{
+  answer: "a" | "b"
 }
 ```

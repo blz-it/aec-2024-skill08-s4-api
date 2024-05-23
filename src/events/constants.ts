@@ -3,18 +3,18 @@ export const actions = ['flashlight', 'vote'];
 export const events = [
   {
     name: 'aeg-beneficiary-concert',
-    availableActions: ['flashlight'],
-  },
-  {
-    name: 'pop-concert',
-    availableActions: ['flashlight'],
-  },
-  {
-    name: 'AEC-OC',
     availableActions: ['flashlight', 'vote'],
   },
   {
-    name: 'AEC-CC',
+    name: 'pop-concert',
+    availableActions: ['flashlight', 'vote'],
+  },
+  {
+    name: 'aec-oc',
+    availableActions: ['flashlight', 'vote'],
+  },
+  {
+    name: 'aec-cc',
     availableActions: ['flashlight', 'vote'],
   },
 ];

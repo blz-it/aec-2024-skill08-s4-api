@@ -21,9 +21,7 @@ jobs:
         run: python -m pip install -U md2html-phuker
 
       - name: Generate HTML documentation
-        run: |
-          md2html docs/s4-api-docs.md
-          md2html docs/s4-api-docs-od.md
+        run: md2html docs/s4-api-docs.md
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
