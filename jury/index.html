@@ -39,10 +39,30 @@
         padding: 1rem;
         margin: 0;
       }
+
+      #urlInputContainer {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      #urlInput {
+        width: 300px;
+        padding: 0.5rem;
+        font-size: 1rem;
+      }
+
+      #setUrlButton {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
     </style>
   </head>
   <body>
     <h1>Jury Tool</h1>
+    <div id="urlInputContainer">
+      <input type="text" id="urlInput" placeholder="Enter backend URL" />
+      <button id="setUrlButton">Set URL</button>
+    </div>
     <div id="events"></div>
     <script>
       const events = [
@@ -51,6 +71,8 @@
         'aec-oc',
         'aec-cc',
       ];
+
+      let backendUrl = '';
 
       // Create html elements for each event
       events.forEach((event) => {
@@ -64,21 +86,35 @@
 
         const pre = document.createElement('pre');
         pre.id = event + '-data';
-        pre.textContent = 'Loading...';
+        pre.textContent = 'Enter a backend URL to start';
         document.getElementById(event).appendChild(pre);
       });
 
-      // Update data for each event, every second
-      setInterval(() => {
+      document.getElementById('setUrlButton').addEventListener('click', () => {
+        backendUrl = document.getElementById('urlInput').value;
+        if (backendUrl) {
+          updateEventData();
+        }
+      });
+
+      function updateEventData() {
+        // Update text to "Loading..." once fetching starts
         events.forEach((event) => {
-          fetch(`http://localhost:3000/events/${event}/subscribe?wait=false`)
-            .then((response) => response.json())
-            .then((data) => {
-              document.getElementById(event + '-data').textContent =
-                JSON.stringify(data, null, 2);
-            });
+          document.getElementById(event + '-data').textContent = 'Loading...';
         });
-      }, 1000);
+
+        // Update data for each event, every second
+        setInterval(() => {
+          events.forEach((event) => {
+            fetch(`${backendUrl}/events/${event}/subscribe?wait=false`)
+              .then((response) => response.json())
+              .then((data) => {
+                document.getElementById(event + '-data').textContent =
+                  JSON.stringify(data, null, 2);
+              });
+          });
+        }, 1000);
+      }
     </script>
   </body>
 </html>
