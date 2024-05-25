@@ -7,7 +7,6 @@ interface Client {
 }
 
 export interface Vote {
-  event: string;
   answer: 'a' | 'b';
   createdAt: Date;
 }
@@ -19,7 +18,10 @@ export class EventsService {
     (acc, event) => ({ ...acc, [event.name]: { action: null } }),
     {},
   );
-  private votes: Vote[] = [];
+  private votes: Record<string, Vote[]> = events.reduce(
+    (acc, event) => ({ ...acc, [event.name]: [] }),
+    {},
+  );
 
   constructor() {
     events.forEach((event) => this.scheduleNewAction(event.name));
@@ -76,10 +78,10 @@ export class EventsService {
   }
 
   addVote(event: string, answer: 'a' | 'b') {
-    this.votes.push({ event, answer, createdAt: new Date() });
+    this.votes[event].push({ answer, createdAt: new Date() });
   }
 
   getVotes(event: string) {
-    return this.votes.filter((vote) => vote.event === event);
+    return this.votes[event];
   }
 }
