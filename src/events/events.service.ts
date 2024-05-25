@@ -6,6 +6,12 @@ interface Client {
   callback: (data: any) => void;
 }
 
+export interface Vote {
+  event: string;
+  answer: 'a' | 'b';
+  createdAt: Date;
+}
+
 @Injectable()
 export class EventsService {
   private clients: Client[] = [];
@@ -13,6 +19,7 @@ export class EventsService {
     (acc, event) => ({ ...acc, [event.name]: { action: null } }),
     {},
   );
+  private votes: Vote[] = [];
 
   constructor() {
     events.forEach((event) => this.scheduleNewAction(event.name));
@@ -66,5 +73,13 @@ export class EventsService {
 
   getCurrentAction(event: string) {
     return this.currentActions[event];
+  }
+
+  addVote(event: string, answer: 'a' | 'b') {
+    this.votes.push({ event, answer, createdAt: new Date() });
+  }
+
+  getVotes(event: string) {
+    return this.votes.filter((vote) => vote.event === event);
   }
 }

@@ -44,5 +44,15 @@ export class EventsController {
     if (!answer || !['a', 'b'].includes(answer)) {
       throw new BadRequestException('Invalid answer');
     }
+
+    this.eventsService.addVote(id, answer);
+  }
+
+  @Get(':id/vote/results')
+  getVotes(@Param('id') id: string) {
+    const event = events.find((e) => e.name === id);
+    if (!event) throw new NotFoundException('Event not found');
+
+    return this.eventsService.getVotes(id);
   }
 }
