@@ -19,7 +19,7 @@
       }
 
       #events > div {
-        min-height: 200px;
+        min-height: 350px;
       }
 
       div {
@@ -32,12 +32,17 @@
         margin-top: 0;
       }
 
+      h4 {
+        margin-bottom: 0.5rem;
+      }
+
       pre {
         background-color: #f9f9f9;
         border: 1px solid #ccc;
         border-radius: 5px;
         padding: 1rem;
         margin: 0;
+        margin-bottom: 1rem;
       }
 
       #urlInputContainer {
@@ -74,7 +79,7 @@
 
       let backendUrl = '';
 
-      // Create html elements for each event
+      // Create HTML elements for each event
       events.forEach((event) => {
         const div = document.createElement('div');
         div.id = event;
@@ -84,10 +89,23 @@
         h3.textContent = event;
         document.getElementById(event).appendChild(h3);
 
-        const pre = document.createElement('pre');
-        pre.id = event + '-data';
-        pre.textContent = 'Enter a backend URL to start';
-        document.getElementById(event).appendChild(pre);
+        const h4Subscribe = document.createElement('h4');
+        h4Subscribe.textContent = 'Current Action';
+        document.getElementById(event).appendChild(h4Subscribe);
+
+        const preSubscribe = document.createElement('pre');
+        preSubscribe.id = event + '-data';
+        preSubscribe.textContent = 'Enter a backend URL to start';
+        document.getElementById(event).appendChild(preSubscribe);
+
+        const h4Vote = document.createElement('h4');
+        h4Vote.textContent = 'Votes';
+        document.getElementById(event).appendChild(h4Vote);
+
+        const preVote = document.createElement('pre');
+        preVote.id = event + '-vote';
+        preVote.textContent = 'Enter a backend URL to start';
+        document.getElementById(event).appendChild(preVote);
       });
 
       document.getElementById('setUrlButton').addEventListener('click', () => {
@@ -101,6 +119,7 @@
         // Update text to "Loading..." once fetching starts
         events.forEach((event) => {
           document.getElementById(event + '-data').textContent = 'Loading...';
+          document.getElementById(event + '-vote').textContent = 'Loading...';
         });
 
         // Update data for each event, every second
@@ -110,6 +129,13 @@
               .then((response) => response.json())
               .then((data) => {
                 document.getElementById(event + '-data').textContent =
+                  JSON.stringify(data, null, 2);
+              });
+
+            fetch(`${backendUrl}/events/${event}/vote/results`)
+              .then((response) => response.json())
+              .then((data) => {
+                document.getElementById(event + '-vote').textContent =
                   JSON.stringify(data, null, 2);
               });
           });
