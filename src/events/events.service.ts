@@ -14,10 +14,6 @@ export interface Vote {
 @Injectable()
 export class EventsService {
   private clients: Client[] = [];
-  private currentActions: Record<string, any> = events.reduce(
-    (acc, event) => ({ ...acc, [event.name]: { action: null } }),
-    {},
-  );
   private votes: Record<string, Vote[]> = events.reduce(
     (acc, event) => ({ ...acc, [event.name]: [] }),
     {},
@@ -31,11 +27,11 @@ export class EventsService {
     this.clients.push(client);
   }
 
-  notifyClients(event: string) {
+  notifyClients(event: string, action: any) {
     // Notify all clients subscribed to the event
     this.clients
       .filter((client) => client.subscribedEvent === event)
-      .forEach((client) => client.callback(this.currentActions[event]));
+      .forEach((client) => client.callback(action));
 
     // Remove clients subscribed to the event
     this.clients = this.clients.filter(
@@ -53,28 +49,21 @@ export class EventsService {
 
     setTimeout(() => {
       if (selectedAction === 'flashlight') {
-        this.currentActions[event] = { action: { type: 'flashlight' } };
+        this.notifyClients(event, { action: { type: 'flashlight' } });
       } else if (selectedAction === 'vote') {
         const question =
           questions[Math.floor(Math.random() * questions.length)];
-        this.currentActions[event] = { action: { type: 'vote', ...question } };
+        this.notifyClients(event, { action: { type: 'vote', ...question } });
       }
-
-      this.notifyClients(event);
 
       setTimeout(
         () => {
-          this.currentActions[event] = { action: null };
-          this.notifyClients(event);
+          this.notifyClients(event, { action: null });
           this.scheduleNewAction(event);
         },
         selectedAction === 'flashlight' ? 5000 : 15000,
       );
     }, delay);
-  }
-
-  getCurrentAction(event: string) {
-    return this.currentActions[event];
   }
 
   addVote(event: string, answer: 'a' | 'b') {

@@ -10,8 +10,6 @@ The API provides endpoints to subscribe to the actions of an event and to send a
 
 This endpoint uses HTTP Long Polling, meaning the connection will remain open until an action is available. Clients should make a request to this endpoint and wait for a response. Once a response is received, the client should immediately make another request to continue receiving actions.
 
-For the initial request, it is possible to pass the query parameter `wait=false` to get the current action immediately.
-
 ```
 GET /events/:id/subscribe
 ```
