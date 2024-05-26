@@ -116,30 +116,45 @@
       });
 
       function updateEventData() {
-        // Update text to "Loading..." once fetching starts
         events.forEach((event) => {
-          document.getElementById(event + '-data').textContent = 'Loading...';
+          document.getElementById(event + '-data').textContent =
+            'Waiting for next action...';
           document.getElementById(event + '-vote').textContent = 'Loading...';
+          pollEventData(event);
+          pollEventVotes(event);
         });
+      }
 
-        // Update data for each event, every second
-        setInterval(() => {
-          events.forEach((event) => {
-            fetch(`${backendUrl}/events/${event}/subscribe?wait=false`)
-              .then((response) => response.json())
-              .then((data) => {
-                document.getElementById(event + '-data').textContent =
-                  JSON.stringify(data, null, 2);
-              });
-
-            fetch(`${backendUrl}/events/${event}/vote/results`)
-              .then((response) => response.json())
-              .then((data) => {
-                document.getElementById(event + '-vote').textContent =
-                  JSON.stringify(data, null, 2);
-              });
+      function pollEventData(event) {
+        fetch(`${backendUrl}/events/${event}/subscribe`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(event + '-data').textContent =
+              JSON.stringify(data, null, 2);
+            // Call the function again to keep polling
+            pollEventData(event);
+          })
+          .catch((error) => {
+            console.error('Error polling event data:', error);
+            // Retry after a short delay in case of an error
+            setTimeout(() => pollEventData(event), 1000);
           });
-        }, 1000);
+      }
+
+      function pollEventVotes(event) {
+        fetch(`${backendUrl}/events/${event}/vote/results`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(event + '-vote').textContent =
+              JSON.stringify(data, null, 2);
+            // Call the function again to keep polling
+            pollEventVotes(event);
+          })
+          .catch((error) => {
+            console.error('Error polling event votes:', error);
+            // Retry after a short delay in case of an error
+            setTimeout(() => pollEventVotes(event), 1000);
+          });
       }
     </script>
   </body>
