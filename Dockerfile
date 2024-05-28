@@ -16,6 +16,7 @@ FROM base as runner
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/static/event-links ./static/event-links
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
 
