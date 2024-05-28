@@ -8,7 +8,7 @@ The API provides endpoints to subscribe to the actions of an event and to send a
 
 ### Subscribe to an Event
 
-This endpoint uses HTTP Long Polling, meaning the connection will remain open until an action is available. Clients should make a request to this endpoint and wait for a response. Once a response is received, the client should immediately make another request to continue receiving actions.
+This endpoint uses **HTTP Long Polling**, meaning the connection will remain open until an action is available. Clients should make a request to this endpoint and wait for a response. Once a response is received, the client should immediately make another request to continue receiving actions.
 
 ```
 GET /events/:id/subscribe
@@ -37,7 +37,7 @@ Example Responses
 
 ### Answer a Poll
 
-This endpoint allows clients to answer a poll. The client should make a POST request to this endpoint with the answer in the request body.
+This endpoint allows clients to answer a poll. In contrast to the first endpoint, this one uses **HTTP Short Polling**. The client should make a POST request to this endpoint with the answer in the request body.
 
 ```
 POST /events/:id/vote
